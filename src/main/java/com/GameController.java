@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.Map;
 
 @RequestMapping("/game")
 @RestController
@@ -19,6 +20,7 @@ public class GameController {
 	private static final String FAILED_STATUS = "FAILURE";
 
 	private static HashMap<String, Game> assignedGames = new HashMap<>();
+
 	@Autowired
 	private LeaderBoard leaderBoard;
 
@@ -32,10 +34,18 @@ public class GameController {
 		return responseEntity;
 	}
 
+
+
 	@RequestMapping(value = "/leaderboard", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
 	public LeaderBoard getLeaderBoard() {
 		return leaderBoard;
 	}
+
+	@RequestMapping(value = "/assigned", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+	public Map<String, Game> getAssigned() {
+		return assignedGames;
+	}
+
 
 	@RequestMapping(value = "/solved", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
 	public Response solved(@RequestBody Game game) {

@@ -106,6 +106,10 @@ public class GameController {
 		Integer array[] = new Integer[9];
 		for (int i = 0; i < 9; i++) {
 			array[i] = game.getGame().get(i);
+			if(array[i] ==0)
+			{
+				zp =i;
+			}
 		}
 		for (int clickPos : game.getSolution()) {
 			try {

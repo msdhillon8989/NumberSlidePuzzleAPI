@@ -16,7 +16,7 @@ public class StringListConverter implements AttributeConverter<List<Integer>, St
         {
             sb.append(element).append(",");
         }
-        sb.setLength(19);
+        sb.setLength(18);
         System.out.println("Converted string "+sb.toString());
         return sb.toString();
 

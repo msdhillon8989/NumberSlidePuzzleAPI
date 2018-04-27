@@ -46,7 +46,7 @@ public class GameService {
                 Response response = validations(currentMillis, assignedGame, solvedGame);
 
                 if (response.getStatus().equals("SUCCESS")) {
-                    assignedGame.setTimeTaken(solvedGame.getTimeTaken());
+                   
                     if (assignedGame.getTimeTaken() == null) {
                         assignedGame.setTimeTaken(solvedGame.getTimeTaken());
                         assignedGame.setMoves(solvedGame.getSolution().size());

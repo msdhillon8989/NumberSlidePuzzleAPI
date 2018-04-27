@@ -1,4 +1,4 @@
-package com;
+package com.game.puzzle.entity;
 
 public class UserScore {
 	private Long time;

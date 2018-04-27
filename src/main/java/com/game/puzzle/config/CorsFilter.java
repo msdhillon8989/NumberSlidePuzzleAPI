@@ -1,4 +1,4 @@
-package com;
+package com.game.puzzle.config;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

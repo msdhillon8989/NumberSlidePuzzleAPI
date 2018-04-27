@@ -1,4 +1,4 @@
-package com;
+package com.game.puzzle.entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

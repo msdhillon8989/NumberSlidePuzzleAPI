@@ -6,12 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RequestMapping("/game")
@@ -36,18 +34,19 @@ public class GameController {
 		return responseEntity;
 	}*/
 
-    @RequestMapping(value = "/", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Game> getStoredGame(HttpServletRequest request) {
-        Game g = gameService.assignNewGame(request.getHeader("username"));
+    @RequestMapping(value = "/{level}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Game> getStoredGame(@PathVariable(value = "level") Integer level , HttpServletRequest request) {
+
+        Game g = gameService.assignNewGame(level,request.getHeader("username"));
 
         ResponseEntity<Game> responseEntity = new ResponseEntity<>(g, HttpStatus.OK);
         return responseEntity;
     }
 
 
-	@RequestMapping(value = "/leaderboard", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public List<Game> getLeaderBoard() {
-		return gameService.getLeaderBoard();
+	@RequestMapping(value = "/leaderboard/{level}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+	public List<Game> getLeaderBoard(@PathVariable(value = "level") Integer level) {
+		return gameService.getLeaderBoard(level);
 	}
 
 	/*@RequestMapping(value = "/assigned", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})

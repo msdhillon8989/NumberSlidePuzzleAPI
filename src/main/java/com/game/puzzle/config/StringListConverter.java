@@ -16,8 +16,8 @@ public class StringListConverter implements AttributeConverter<List<Integer>, St
         {
             sb.append(element).append(",");
         }
-        sb.setLength(18);
-        System.out.println("Converted string "+sb.toString());
+        sb.setLength(sb.length()-1);
+
         return sb.toString();
 
     }
@@ -35,8 +35,6 @@ public class StringListConverter implements AttributeConverter<List<Integer>, St
             catch (Exception e)
             {
                 System.out.println("Error while parsing ---  ("+num+")");
-
-
             }
         }
 

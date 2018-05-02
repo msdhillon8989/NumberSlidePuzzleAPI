@@ -14,14 +14,22 @@ public class GameService {
     @Autowired
     private GameRepository gameRepository;
 
-    Game assignNewGame(String username) {
+    Game assignNewGame(Integer level,String username) {
+        if(level <=3)
+        {
+            level =3;
+        }
+        else if(level >5)
+        {
+            level =5;
+        }
         if (username != null) {
-            Game g = gameRepository.findByUsername(username);
+            Game g = gameRepository.findByUsernameAndLevel(username,level);
             if (g != null) {
                 g.initNewGame();
 
             } else {
-                g = new Game(3);
+                g = new Game(level);
                 g.setUsername(username);
 
             }
@@ -32,15 +40,15 @@ public class GameService {
         return null;
     }
 
-    List<Game> getLeaderBoard() {
-        return gameRepository.findGameByTimeTakenNotNullOrderByTimeTakenAscMovesAsc();
+    List<Game> getLeaderBoard(Integer level) {
+        return gameRepository.findGameByLevelAndTimeTakenNotNullOrderByTimeTakenAscMovesAsc(level);
     }
 
     Response solved(Game solvedGame) {
         Long currentMillis = System.currentTimeMillis();
         try {
             if (solvedGame != null && solvedGame.getUsername() != null) {
-                Game assignedGame = gameRepository.findByUsername(solvedGame.getUsername());
+                Game assignedGame = gameRepository.findByUsernameAndLevel(solvedGame.getUsername(),solvedGame.getLevel());
 
 
                 Response response = validations(currentMillis, assignedGame, solvedGame);
@@ -96,11 +104,12 @@ public class GameService {
     }
 
     private boolean isValidSolution(Game game) {
-        int zp = 8;
+        int zp = 0;
 
-        Integer array[] = new Integer[9];
+        int MAX_ELEMENTS = game.getLevel()*game.getLevel();
+        Integer array[] = new Integer[MAX_ELEMENTS];
         List<Integer> gameList = game.getGame();
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < MAX_ELEMENTS; i++) {
             array[i] = gameList.get(i);
             if (array[i] == 0) {
                 zp = i;
@@ -117,7 +126,7 @@ public class GameService {
             }
         }
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < MAX_ELEMENTS-1; i++) {
             if (array[i] != (i + 1)) {
                 return false;
             }

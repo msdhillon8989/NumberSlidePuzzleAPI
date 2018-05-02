@@ -80,12 +80,14 @@ public class Game {
 
         arr[level - 1][level - 1] = 0;
 
-        int posx = level - 1;
-        int posy = level - 1;
+        int posx = level-1;
+        int posy = level-1;
 
         int posChange[][] = {{0, -1}, {0, 1}, {1, 0}, {-1, 0}};
 
-        for (int i = 0; i < 200; i++) {
+        int lastx=posx;
+        int lasty=posy;
+        for (int i = 0; i < 50 * level; i++) {
             int newx = posx, newy = posy;
             boolean canSlide = false;
             while (true) {
@@ -96,14 +98,21 @@ public class Game {
                 newy = posy + shiftTo[1];
 
                 if (newx >= 0 && newx < level && newy >= 0 && newy < level) {
-                    break;
+                    if(! (lastx == newx && lasty ==newy))
+                    {
+                        lastx = posx;
+                        lasty = posy;
+                        break;
+                    }
                 }
+
             }
 
             arr[posx][posy] = arr[newx][newy];
             arr[newx][newy] = 0;
             posx = newx;
             posy = newy;
+
         }
 
         game = new ArrayList<>();

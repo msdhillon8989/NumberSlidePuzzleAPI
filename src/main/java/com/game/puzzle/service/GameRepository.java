@@ -8,9 +8,9 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface GameRepository extends CrudRepository<Game, Long> {
-    Game findByUsername(String username);
+    Game findByUsernameAndLevel(String username,Integer level);
 
-    List<Game> findGameByTimeTakenNotNullOrderByTimeTakenAscMovesAsc();
+    List<Game> findGameByLevelAndTimeTakenNotNullOrderByTimeTakenAscMovesAsc(Integer level);
 
 
 }

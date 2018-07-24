@@ -2,50 +2,23 @@ package com.game.puzzle.service;
 
 import com.game.puzzle.entity.Game;
 import com.game.puzzle.entity.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 @Component
-public class MineSweeperGameService {
+public class MineSweeperGameService extends GameService {
 
-    private static final String FAILED_STATUS = "FAILURE";
-    @Autowired
-    private GameRepository gameRepository;
 
+    @Override
     Game assignNewGame(Integer level, String username) {
-
-        if (username != null) {
-            Game g = gameRepository.findByUsernameAndLevel(username, level);
-            if (g == null) {
-                g = new Game(level);
-                g.setUsername(username);
-            }
-            initNewGame(g);
-            g.setGameAssignedTime(System.currentTimeMillis());
-            gameRepository.save(g);
-            return g;
-        }
-        return null;
+        Game g = super.assignNewGame(level, username);
+        g.setMoves(0);
+        return g;
     }
-
-    private Set<String> placeMines(int size, int totalMines) {
-        Set<String> minesPositionSet = new HashSet<>();
-
-        Random random = new Random();
-        int minesPlaced = 0;
-        while (minesPlaced < totalMines) {
-            int x = random.nextInt(size);
-            int y = random.nextInt(size);
-
-            if (minesPositionSet.add(x + "#" + y)) {
-                minesPlaced++;
-            }
-        }
-        return minesPositionSet;
-    }
-
 
     public void initNewGame(Game g) {
         int size = 20;
@@ -66,7 +39,6 @@ public class MineSweeperGameService {
         }
         g.setMoves(sum);
         System.out.println("Total level sum " + sum);
-
     }
 
     private int[][] getMinesArea(int size, int totalMines) {
@@ -92,23 +64,35 @@ public class MineSweeperGameService {
         return arr;
     }
 
+    private Set<String> placeMines(int size, int totalMines) {
+        Set<String> minesPositionSet = new HashSet<>();
 
-    List<Game> getLeaderBoard(Integer level) {
-        return gameRepository.findGameByLevelAndTimeTakenNotNullOrderByTimeTakenAscMovesAsc(level);
+        Random random = new Random();
+        int minesPlaced = 0;
+        while (minesPlaced < totalMines) {
+            int x = random.nextInt(size);
+            int y = random.nextInt(size);
+
+            if (minesPositionSet.add(x + "#" + y)) {
+                minesPlaced++;
+            }
+        }
+        return minesPositionSet;
     }
+
 
     Response solved(Game solvedGame) {
         Long currentMillis = System.currentTimeMillis();
         try {
             if (solvedGame != null && solvedGame.getUsername() != null) {
-                Game assignedGame = gameRepository.findByUsernameAndLevel(solvedGame.getUsername(),solvedGame.getLevel());
+                Game assignedGame = gameRepository.findByUsernameAndLevel(solvedGame.getUsername(), solvedGame.getLevel());
 
 
                 Response response = validations(currentMillis, assignedGame, solvedGame);
 
-                if (response.getStatus().equals("SUCCESS")) {
+                if (response.getStatus().equals(SUCCESS_STATUS)) {
 
-                    if (assignedGame.getTimeTaken() == null  || assignedGame.getTimeTaken()>solvedGame.getTimeTaken()) {
+                    if (assignedGame.getTimeTaken() == null || assignedGame.getTimeTaken() > solvedGame.getTimeTaken()) {
                         assignedGame.setTimeTaken(solvedGame.getTimeTaken());
                     }
                     gameRepository.save(assignedGame);
@@ -126,7 +110,7 @@ public class MineSweeperGameService {
 
 
     private Response validations(Long currentMillis, Game game, Game solvedGame) {
-        String status = "SUCCESS";
+        String status = SUCCESS_STATUS;
         String message = null;
 
         if (game == null) {
@@ -141,7 +125,7 @@ public class MineSweeperGameService {
 
             Long timeTaken = currentMillis - game.getGameAssignedTime();
             timeTaken = timeTaken / 100;
-            System.out.println("TimeTaken :" +timeTaken);
+            System.out.println("TimeTaken :" + timeTaken);
             if (timeTaken - solvedGame.getTimeTaken() > 400) {
                 status = FAILED_STATUS;
                 message = "Are u trying to cheat ??";

@@ -11,35 +11,17 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-@RequestMapping("/game")
-@RestController
-public class GameController {
 
 
-    //private static HashMap<String, Game> assignedGames = new HashMap<>();
-
-
+public abstract class GameController <T extends GameService> {
 
     @Autowired
-    private SlideGameService gameService;
-
-	/*@RequestMapping(value = "/new", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Game> getNewGame(HttpServletRequest request) {
-		Game g = new Game(3);
-		g.setUsername(request.getHeader("username"));
-		g.setGameAssignedTime(System.currentTimeMillis());
-		assignedGames.put(g.getUsername(), g);
-		ResponseEntity<Game> responseEntity = new ResponseEntity<>(g, HttpStatus.OK);
-		return responseEntity;
-	}*/
+    T gameService;
 
     @RequestMapping(value = "/{level}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Game> getStoredGame(@PathVariable(value = "level") Integer level , HttpServletRequest request) {
-
         Game g = gameService.assignNewGame(level,request.getHeader("username"));
-
-        ResponseEntity<Game> responseEntity = new ResponseEntity<>(g, HttpStatus.OK);
-        return responseEntity;
+        return new ResponseEntity<>(g, HttpStatus.OK);
     }
 
 
@@ -48,20 +30,9 @@ public class GameController {
 		return gameService.getLeaderBoard(level);
 	}
 
-	/*@RequestMapping(value = "/assigned", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public Map<String, Game> getAssigned() {
-		return assignedGames;
-	}*/
-
-
     @RequestMapping(value = "/solved", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response solved(@RequestBody Game game) {
-
-
         Response response = gameService.solved(game);
         return response;
-
     }
-
-
 }

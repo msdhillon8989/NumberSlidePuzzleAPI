@@ -2,7 +2,6 @@ package com.game.puzzle.service;
 
 import com.game.puzzle.entity.Game;
 import com.game.puzzle.entity.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -10,33 +9,16 @@ import java.util.List;
 import java.util.Random;
 
 @Component
-public class SlideGameService {
+public class SlideGameService extends GameService {
 
-    private static final String FAILED_STATUS = "FAILURE";
-    @Autowired
-    private GameRepository gameRepository;
 
-    Game assignNewGame(Integer level,String username) {
-        if(level <=3)
-        {
-            level =3;
+    Game assignNewGame(Integer level, String username) {
+        if (level <= 3) {
+            level = 3;
+        } else if (level > 5) {
+            level = 5;
         }
-        else if(level >5)
-        {
-            level =5;
-        }
-        if (username != null) {
-            Game g = gameRepository.findByUsernameAndLevel(username,level);
-            if (g == null) {
-                g = new Game(level);
-                g.setUsername(username);
-            }
-            initNewGame(g);
-            g.setGameAssignedTime(System.currentTimeMillis());
-            gameRepository.save(g);
-            return g;
-        }
-        return null;
+        return super.assignNewGame(level, username);
     }
 
     public void initNewGame(Game g) {
@@ -52,13 +34,13 @@ public class SlideGameService {
 
         arr[level - 1][level - 1] = 0;
 
-        int posx = level-1;
-        int posy = level-1;
+        int posx = level - 1;
+        int posy = level - 1;
 
         int posChange[][] = {{0, -1}, {0, 1}, {1, 0}, {-1, 0}};
 
-        int lastx=posx;
-        int lasty=posy;
+        int lastx = posx;
+        int lasty = posy;
         for (int i = 0; i < 50 * level; i++) {
             int newx = posx, newy = posy;
             boolean canSlide = false;
@@ -70,8 +52,7 @@ public class SlideGameService {
                 newy = posy + shiftTo[1];
 
                 if (newx >= 0 && newx < level && newy >= 0 && newy < level) {
-                    if(! (lastx == newx && lasty ==newy))
-                    {
+                    if (!(lastx == newx && lasty == newy)) {
                         lastx = posx;
                         lasty = posy;
                         break;
@@ -97,20 +78,17 @@ public class SlideGameService {
 
     }
 
-    List<Game> getLeaderBoard(Integer level) {
-        return gameRepository.findGameByLevelAndTimeTakenNotNullOrderByTimeTakenAscMovesAsc(level);
-    }
 
     Response solved(Game solvedGame) {
         Long currentMillis = System.currentTimeMillis();
         try {
             if (solvedGame != null && solvedGame.getUsername() != null) {
-                Game assignedGame = gameRepository.findByUsernameAndLevel(solvedGame.getUsername(),solvedGame.getLevel());
+                Game assignedGame = gameRepository.findByUsernameAndLevel(solvedGame.getUsername(), solvedGame.getLevel());
 
 
                 Response response = validations(currentMillis, assignedGame, solvedGame);
 
-                if (response.getStatus().equals("SUCCESS")) {
+                if (response.getStatus().equals(SUCCESS_STATUS)) {
 
                     if (assignedGame.getTimeTaken() == null) {
                         assignedGame.setTimeTaken(solvedGame.getTimeTaken());
@@ -135,7 +113,7 @@ public class SlideGameService {
 
 
     private Response validations(Long currentMillis, Game game, Game solvedGame) {
-        String status = "SUCCESS";
+        String status = SUCCESS_STATUS;
         String message = null;
 
         if (game == null) {
@@ -163,7 +141,7 @@ public class SlideGameService {
     private boolean isValidSolution(Game game) {
         int zp = 0;
 
-        int MAX_ELEMENTS = game.getLevel()*game.getLevel();
+        int MAX_ELEMENTS = game.getLevel() * game.getLevel();
         Integer array[] = new Integer[MAX_ELEMENTS];
         List<Integer> gameList = game.getGame();
         for (int i = 0; i < MAX_ELEMENTS; i++) {
@@ -183,7 +161,7 @@ public class SlideGameService {
             }
         }
 
-        for (int i = 0; i < MAX_ELEMENTS-1; i++) {
+        for (int i = 0; i < MAX_ELEMENTS - 1; i++) {
             if (array[i] != (i + 1)) {
                 return false;
             }

@@ -41,7 +41,6 @@ public class Game {
 
     public Game(Integer num) {
         level = num;
-        initNewGame();
     }
 
     public Integer getLevel() {
@@ -68,62 +67,7 @@ public class Game {
         this.timeTaken = timeTaken;
     }
 
-    public void initNewGame() {
-        Random random = new Random();
-        int arr[][] = new int[level][level];
-        int x = 1;
-        for (int i = 0; i < level; i++) {
-            for (int j = 0; j < level; j++) {
-                arr[i][j] = x++;
-            }
-        }
 
-        arr[level - 1][level - 1] = 0;
-
-        int posx = level-1;
-        int posy = level-1;
-
-        int posChange[][] = {{0, -1}, {0, 1}, {1, 0}, {-1, 0}};
-
-        int lastx=posx;
-        int lasty=posy;
-        for (int i = 0; i < 50 * level; i++) {
-            int newx = posx, newy = posy;
-            boolean canSlide = false;
-            while (true) {
-                int shift = random.nextInt(4);
-                int shiftTo[] = posChange[shift];
-
-                newx = posx + shiftTo[0];
-                newy = posy + shiftTo[1];
-
-                if (newx >= 0 && newx < level && newy >= 0 && newy < level) {
-                    if(! (lastx == newx && lasty ==newy))
-                    {
-                        lastx = posx;
-                        lasty = posy;
-                        break;
-                    }
-                }
-
-            }
-
-            arr[posx][posy] = arr[newx][newy];
-            arr[newx][newy] = 0;
-            posx = newx;
-            posy = newy;
-
-        }
-
-        game = new ArrayList<>();
-        for (int i = 0; i < level; i++) {
-            for (int j = 0; j < level; j++) {
-                game.add(arr[i][j]);
-            }
-        }
-
-
-    }
 
     public String getUsername() {
         return username;

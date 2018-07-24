@@ -5,10 +5,12 @@ import com.game.puzzle.entity.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Component
-public class GameService {
+public class SlideGameService {
 
     private static final String FAILED_STATUS = "FAILURE";
     @Autowired
@@ -25,19 +27,74 @@ public class GameService {
         }
         if (username != null) {
             Game g = gameRepository.findByUsernameAndLevel(username,level);
-            if (g != null) {
-                g.initNewGame();
-
-            } else {
+            if (g == null) {
                 g = new Game(level);
                 g.setUsername(username);
-
             }
+            initNewGame(g);
             g.setGameAssignedTime(System.currentTimeMillis());
             gameRepository.save(g);
             return g;
         }
         return null;
+    }
+
+    public void initNewGame(Game g) {
+        int level = g.getLevel();
+        Random random = new Random();
+        int arr[][] = new int[level][level];
+        int x = 1;
+        for (int i = 0; i < level; i++) {
+            for (int j = 0; j < level; j++) {
+                arr[i][j] = x++;
+            }
+        }
+
+        arr[level - 1][level - 1] = 0;
+
+        int posx = level-1;
+        int posy = level-1;
+
+        int posChange[][] = {{0, -1}, {0, 1}, {1, 0}, {-1, 0}};
+
+        int lastx=posx;
+        int lasty=posy;
+        for (int i = 0; i < 50 * level; i++) {
+            int newx = posx, newy = posy;
+            boolean canSlide = false;
+            while (true) {
+                int shift = random.nextInt(4);
+                int shiftTo[] = posChange[shift];
+
+                newx = posx + shiftTo[0];
+                newy = posy + shiftTo[1];
+
+                if (newx >= 0 && newx < level && newy >= 0 && newy < level) {
+                    if(! (lastx == newx && lasty ==newy))
+                    {
+                        lastx = posx;
+                        lasty = posy;
+                        break;
+                    }
+                }
+
+            }
+
+            arr[posx][posy] = arr[newx][newy];
+            arr[newx][newy] = 0;
+            posx = newx;
+            posy = newy;
+
+        }
+
+        g.setGame(new ArrayList<>());
+        for (int i = 0; i < level; i++) {
+            for (int j = 0; j < level; j++) {
+                g.getGame().add(arr[i][j]);
+            }
+        }
+
+
     }
 
     List<Game> getLeaderBoard(Integer level) {
@@ -54,7 +111,7 @@ public class GameService {
                 Response response = validations(currentMillis, assignedGame, solvedGame);
 
                 if (response.getStatus().equals("SUCCESS")) {
-                   
+
                     if (assignedGame.getTimeTaken() == null) {
                         assignedGame.setTimeTaken(solvedGame.getTimeTaken());
                         assignedGame.setMoves(solvedGame.getSolution().size());

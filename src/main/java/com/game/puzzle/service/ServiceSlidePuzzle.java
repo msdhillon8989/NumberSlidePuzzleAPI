@@ -4,12 +4,11 @@ import com.game.puzzle.entity.Game;
 import com.game.puzzle.entity.Response;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 @Component
-public class SlideGameService extends GameService {
+public class ServiceSlidePuzzle extends ServiceCommon {
 
 
     Game assignNewGame(Integer level, String username) {
@@ -42,77 +41,53 @@ public class SlideGameService extends GameService {
         int lastx = posx;
         int lasty = posy;
         for (int i = 0; i < 50 * level; i++) {
-            int newx = posx, newy = posy;
-            boolean canSlide = false;
+            int newX, newY ;
+
             while (true) {
                 int shift = random.nextInt(4);
                 int shiftTo[] = posChange[shift];
 
-                newx = posx + shiftTo[0];
-                newy = posy + shiftTo[1];
+                newX = posx + shiftTo[0];
+                newY = posy + shiftTo[1];
 
-                if (newx >= 0 && newx < level && newy >= 0 && newy < level) {
-                    if (!(lastx == newx && lasty == newy)) {
+                if (newX >= 0 && newX < level && newY >= 0 && newY < level) {
+                    if (!(lastx == newX && lasty == newY)) {
                         lastx = posx;
                         lasty = posy;
                         break;
                     }
                 }
-
             }
 
-            arr[posx][posy] = arr[newx][newy];
-            arr[newx][newy] = 0;
-            posx = newx;
-            posy = newy;
-
+            arr[posx][posy] = arr[newX][newY];
+            arr[newX][newY] = 0;
+            posx = newX;
+            posy = newY;
         }
-
-        g.setGame(new ArrayList<>());
         for (int i = 0; i < level; i++) {
             for (int j = 0; j < level; j++) {
                 g.getGame().add(arr[i][j]);
             }
         }
-
-
     }
 
 
-    Response solved(Game solvedGame) {
-        Long currentMillis = System.currentTimeMillis();
-        try {
-            if (solvedGame != null && solvedGame.getUsername() != null) {
-                Game assignedGame = gameRepository.findByUsernameAndLevel(solvedGame.getUsername(), solvedGame.getLevel());
 
 
-                Response response = validations(currentMillis, assignedGame, solvedGame);
+    protected void updateOnSuccess(Game assignedGame, Game solvedGame) {
+        if (assignedGame.getTimeTaken() == null) {
+            assignedGame.setTimeTaken(solvedGame.getTimeTaken());
+            assignedGame.setMoves(solvedGame.getSolution().size());
 
-                if (response.getStatus().equals(SUCCESS_STATUS)) {
-
-                    if (assignedGame.getTimeTaken() == null) {
-                        assignedGame.setTimeTaken(solvedGame.getTimeTaken());
-                        assignedGame.setMoves(solvedGame.getSolution().size());
-
-                    } else if (assignedGame.getTimeTaken() > solvedGame.getTimeTaken() || (assignedGame.getTimeTaken() == solvedGame.getTimeTaken() && assignedGame.getMoves() > solvedGame.getSolution().size())) {
-                        assignedGame.setMoves(assignedGame.getSolution().size());
-                        assignedGame.setTimeTaken(solvedGame.getTimeTaken());
-                    }
-                    gameRepository.save(assignedGame);
-                }
-                return response;
-            } else {
-                return new Response(FAILED_STATUS, "Username is empty");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new Response(FAILED_STATUS, "Exception Something went wrong " + e.getMessage());
+        } else if (assignedGame.getTimeTaken() > solvedGame.getTimeTaken() || (assignedGame.getTimeTaken() == solvedGame.getTimeTaken() && assignedGame.getMoves() > solvedGame.getSolution().size())) {
+            assignedGame.setMoves(assignedGame.getSolution().size());
+            assignedGame.setTimeTaken(solvedGame.getTimeTaken());
         }
-
+        gameRepository.save(assignedGame);
     }
 
 
-    private Response validations(Long currentMillis, Game game, Game solvedGame) {
+    protected Response validations(Long currentMillis, Game game, Game solvedGame) {
         String status = SUCCESS_STATUS;
         String message = null;
 

@@ -13,7 +13,7 @@ import java.util.List;
 
 
 
-public abstract class GameController <T extends GameService> {
+public abstract class ControllerCommon<T extends ServiceCommon> {
 
     @Autowired
     T gameService;

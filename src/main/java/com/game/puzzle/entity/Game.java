@@ -27,6 +27,7 @@ public class Game {
     private Integer level;
     @Transient
     private List<Integer> solution;
+
     @Column(name = "time")
     private Long timeTaken;
     @Column(name = "moves")

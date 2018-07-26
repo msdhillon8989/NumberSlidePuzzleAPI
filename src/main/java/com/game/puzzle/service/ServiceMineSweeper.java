@@ -4,13 +4,12 @@ import com.game.puzzle.entity.Game;
 import com.game.puzzle.entity.Response;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
 @Component
-public class MineSweeperGameService extends GameService {
+public class ServiceMineSweeper extends ServiceCommon {
 
 
     @Override
@@ -22,10 +21,7 @@ public class MineSweeperGameService extends GameService {
 
     public void initNewGame(Game g) {
         int size = 20;
-        g.setGame(new ArrayList<>());
-
         int arr[][] = getMinesArea(size, g.getLevel());
-
         int i = 0;
         int sum = 0;
         for (int row[] : arr) {
@@ -81,35 +77,15 @@ public class MineSweeperGameService extends GameService {
     }
 
 
-    Response solved(Game solvedGame) {
-        Long currentMillis = System.currentTimeMillis();
-        try {
-            if (solvedGame != null && solvedGame.getUsername() != null) {
-                Game assignedGame = gameRepository.findByUsernameAndLevel(solvedGame.getUsername(), solvedGame.getLevel());
-
-
-                Response response = validations(currentMillis, assignedGame, solvedGame);
-
-                if (response.getStatus().equals(SUCCESS_STATUS)) {
-
-                    if (assignedGame.getTimeTaken() == null || assignedGame.getTimeTaken() > solvedGame.getTimeTaken()) {
-                        assignedGame.setTimeTaken(solvedGame.getTimeTaken());
-                    }
-                    gameRepository.save(assignedGame);
-                }
-                return response;
-            } else {
-                return new Response(FAILED_STATUS, "Username is empty");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new Response(FAILED_STATUS, "Exception Something went wrong " + e.getMessage());
+    protected void updateOnSuccess(Game assignedGame, Game solvedGame) {
+        if (assignedGame.getTimeTaken() == null || assignedGame.getTimeTaken() > solvedGame.getTimeTaken()) {
+            assignedGame.setTimeTaken(solvedGame.getTimeTaken());
         }
-
+        gameRepository.save(assignedGame);
     }
 
 
-    private Response validations(Long currentMillis, Game game, Game solvedGame) {
+    protected Response validations(Long currentMillis, Game game, Game solvedGame) {
         String status = SUCCESS_STATUS;
         String message = null;
 

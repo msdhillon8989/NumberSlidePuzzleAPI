@@ -1,11 +1,11 @@
 package com.game.puzzle.service;
 
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/slide")
+@RequestMapping("/mines")
 @RestController
-public class SlideGameController extends GameController<SlideGameService> {
-
+public class ControllerMineSweeper extends ControllerCommon<ServiceMineSweeper> {
 
 }

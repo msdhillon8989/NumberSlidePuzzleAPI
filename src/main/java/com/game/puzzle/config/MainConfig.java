@@ -14,7 +14,7 @@ public class MainConfig {
 
     @Bean
     public DataSource dataSource() throws URISyntaxException {
-
+        System.out.println("Loading DB");
         URI dbUri = new URI(System.getenv("DATABASE_URL"));
 
         String username = dbUri.getUserInfo().split(":")[0];
@@ -25,6 +25,7 @@ public class MainConfig {
         dataSourceBuilder.url(dbUrl);
         dataSourceBuilder.username(username);
         dataSourceBuilder.password(password);
+         System.out.println("DB Connected");
         return dataSourceBuilder.build();
     }
 }

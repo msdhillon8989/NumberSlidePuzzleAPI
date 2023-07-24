@@ -10,13 +10,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 
-@RequestMapping("/api")
+
 @RestController
 public class HealthCheckController {
 
-    @RequestMapping(value = "/healthcheck", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<String> getStoredGame() {
-
-        return new ResponseEntity<>("{\"status\" : \"UP\"}", HttpStatus.OK);
+    @GetMapping({"/", "/home", "/status"})
+    public String getStatus() {
+        return "Application is up and running";
     }
 }

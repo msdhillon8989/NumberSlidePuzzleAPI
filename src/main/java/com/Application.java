@@ -10,7 +10,11 @@ public class Application {
 
 	public static void main(String[] args) {
 		System.out.println("Staring Game APP");
-		SpringApplication.run(Application.class, args);
+		try {
+			SpringApplication.run(Application.class, args);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 
 
